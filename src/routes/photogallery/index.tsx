@@ -1,6 +1,7 @@
 import { component$, useServerMount$, useStore } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
 
+
 export type ImageType = {
   id: number;
   JobID: number;
@@ -20,6 +21,39 @@ export type Data = {
   images: ImageType[];
 };
 
+////////////////////////////////////////////////////////////////////
+export const selectionDone = async (state: any) => {
+  const inputData: Data = state.data;
+  fetch(
+    "http://ec2-65-0-55-55.ap-south-1.compute.amazonaws.com:3000/updatefolder",
+    {
+      mode: "no-cors",
+      method: "POST",
+      body: JSON.stringify(inputData),
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then(async (json) => await json.text())
+    .then((data) => console.log(data))
+    .catch((eror) => console.error(eror));
+};
+
+export const saveFolder = async (state: any) => {
+  const inputData: Data = state.data;
+  fetch(
+    "http://ec2-65-0-55-55.ap-south-1.compute.amazonaws.com:3000/updatefolder",
+    {
+      mode: "no-cors",
+      method: "POST",
+      body: JSON.stringify(inputData),
+      headers: { "Content-Type": "application/json" },
+    }
+  )
+    .then(async (json) => await json.text())
+    .then((data) => console.log(data))
+    .catch((eror) => console.error(eror));
+};
+/////////////////////////////////////////////////////////////////////////
 export default component$(() => {
   const loc = useLocation();
   const uid: string = loc.query.uid;
@@ -41,6 +75,12 @@ export default component$(() => {
       folderid;
     const res = await fetch(url);
     store.data = await res.json();
+    store.data.status = 2;
+    // this function run here perfectly we can see console log in terminal but 
+    // when i use this func on button => onclick it does not work my backend though 400 BAD REQUEST at the bottom 
+    // To reproduce run project with npm start go to link this  http://localhost:5173/photogallery/?uid=3&folder=jhk and 
+    // open browser console click on any button then see result 
+    await saveFolder(store);
   });
 
   return (
@@ -84,13 +124,13 @@ export default component$(() => {
       </div>
       <div className="sticky bottom-0 flex flex-row bg-white lg:justify-end justify-between items-center  px-5 min-w-screen">
         <button
-          onClick$={async () => saveFolder(store)}
+          onClick$={async () => await saveFolder(store)}
           className="m-3 flex items-center justify-center rounded-full  peer-hover:bg-indigo-600 py-2 px-3 text-base font-medium text-indigo-700 hover:bg-indigo-100 "
         >
           Save Selection
         </button>
         <button
-          onClick$={async () => selectionDone(store)}
+          onClick$={async () => await selectionDone(store)}
           className="m-3 flex items-center justify-center rounded-full  peer-hover:bg-indigo-600 py-2 px-3 text-base font-medium text-indigo-700 hover:bg-indigo-100 "
         >
           Selection Done
@@ -100,35 +140,3 @@ export default component$(() => {
   );
 });
 
-////////////////////////////////////////////////////////////////////
-export const selectionDone = async (state: any) => {
-  const inputData: Data = state.data;
-  fetch(
-    "http://ec2-65-0-55-55.ap-south-1.compute.amazonaws.com:3000/updatefolder",
-    {
-      mode: "no-cors",
-      method: "POST",
-      body: JSON.stringify(inputData),
-      headers: { "Content-Type": "application/json" },
-    }
-  )
-    .then(async (json) => await json.text())
-    .then((data) => console.log(data))
-    .catch((eror) => console.error(eror));
-};
-
-export const saveFolder = async (state: any) => {
-  const inputData: Data = state.data;
-  fetch(
-    "http://ec2-65-0-55-55.ap-south-1.compute.amazonaws.com:3000/updatefolder",
-    {
-      mode: "no-cors",
-      method: "POST",
-      body: JSON.stringify(inputData),
-      headers: { "Content-Type": "application/json" },
-    }
-  )
-    .then(async (json) => await json.text())
-    .then((data) => console.log(data))
-    .catch((eror) => console.error(eror));
-};
